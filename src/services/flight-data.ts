@@ -46,16 +46,39 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     // Assuming the first sheet is the one with flight data
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-    const rawData: any[] = XLSX.utils.sheet_to_json(sheet);
+    const rawData: any[] = XLSX.utils.sheet_to_json(sheet, {header: 1});
 
-    // Transform the raw data into the FlightData format
-    const flightData: FlightData[] = rawData.map(item => ({
-      scheduledArrivalTime: item['Sch Arrival Time'] || '',
-      status: item['Act. Arrival'] || '',
-      flightNumber: item['Flight'] || '',
-      destination: item['Destination'] || '',
-      gate: item['Gate'] || '',
-    }));
+    // Check if rawData has at least one row (header row)
+    if (!rawData || rawData.length === 0) {
+        throw new Error("No data found in the Excel sheet.");
+    }
+
+    // Extract the header row and data rows, handling potential undefined values
+    const headerRow = rawData[0] as string[]; // Header row
+    const dataRows = rawData.slice(1) as string[][];   // Data rows
+
+      // Find the indices of the required columns
+      const schArrivalTimeIndex = headerRow.findIndex(header => header?.trim() === 'Sch Arrival Time');
+      const actArrivalIndex = headerRow.findIndex(header => header?.trim() === 'Act. Arrival');
+      const flightIndex = headerRow.findIndex(header => header?.trim() === 'Flight');
+      const destinationIndex = headerRow.findIndex(header => header?.trim() === 'Destination');
+      const gateIndex = headerRow.findIndex(header => header?.trim() === 'Gate');
+
+      // Check if all required columns are found
+      if (schArrivalTimeIndex === -1 || actArrivalIndex === -1 || flightIndex === -1 || destinationIndex === -1 || gateIndex === -1) {
+          throw new Error("One or more required columns not found in the Excel sheet.");
+      }
+
+      // Transform the raw data into the FlightData format
+      const flightData: FlightData[] = dataRows.map(row => {
+          return {
+              scheduledArrivalTime: row[schArrivalTimeIndex] || '',
+              status: row[actArrivalIndex] || '',
+              flightNumber: row[flightIndex] || '',
+              destination: row[destinationIndex] || '',
+              gate: row[gateIndex] || '',
+          };
+      });
 
     return flightData;
   } catch (error: any) {
