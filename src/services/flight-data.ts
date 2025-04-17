@@ -85,7 +85,7 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
       });
 
     return flightData;
-  } catch (error: any) {
+  } catch (error) {
       let message = 'Failed to fetch';
       if (error instanceof Error) {
           message = error.message;
