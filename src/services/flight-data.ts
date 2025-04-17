@@ -34,9 +34,15 @@ export interface FlightData {
  */
 export async function getFlightData(url: string): Promise<FlightData[]> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds
+
     const response = await fetch(url, {
-      mode: 'cors' // Add this to handle potential CORS issues
+      mode: 'cors', // Add this to handle potential CORS issues
+	  signal: controller.signal,
     });
+
+	clearTimeout(timeoutId);
 
     if (!response.ok) {
       console.error("Fetch failed with status:", response.status);
@@ -96,6 +102,9 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     return flightData;
   } catch (error: any) {
       let message = 'Failed to fetch';
+	  if (error instanceof DOMException && error.name === 'AbortError') {
+		  message = 'Request timed out';
+	  }
       if (error instanceof Error) {
           message = error.message;
       }
@@ -103,3 +112,5 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     throw new Error(message); // Re-throw the error to be caught by the component
   }
 }
+
+    
