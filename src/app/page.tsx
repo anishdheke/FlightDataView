@@ -51,10 +51,16 @@ export default function Home() {
   }, [fetchData]);
 
   useEffect(() => {
+    const gates = filterCriteria.gate
+      .toLowerCase()
+      .split(",")
+      .map((gate) => gate.trim());
+
     let results = flightData.filter((item) => {
-      return (
-        item.gate.toLowerCase().includes(filterCriteria.gate.toLowerCase())
-      );
+      if (gates.length === 0 || (gates.length === 1 && gates[0] === "")) {
+        return true; // Show all if no filter is applied
+      }
+      return gates.some((gate) => item.gate.toLowerCase().includes(gate));
     });
 
     // Sorting logic
