@@ -59,7 +59,11 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
 
     return flightData;
   } catch (error: any) {
-    console.error("Error fetching or parsing flight data:", error);
-    return []; // Return an empty array in case of error
+      let message = 'Failed to fetch flight data.';
+      if (error instanceof Error) {
+          message = error.message;
+      }
+    console.error("Error fetching or parsing flight data:", message);
+    throw new Error(message); // Re-throw the error to be caught by the component
   }
 }
