@@ -7,9 +7,9 @@ export interface FlightData {
    */
   scheduledArrivalTime: string;
   /**
-   * The actual arrival time.
+   * The status of flight.
    */
-  actualArrivalTime: string;
+  status: string;
   /**
    * The flight number.
    */
@@ -38,84 +38,84 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
   return [
     {
       scheduledArrivalTime: "10:00",
-      actualArrivalTime: "10:15",
+      status: "On Time",
       flightNumber: "AA123",
       destination: "LAX",
       gate: "A1",
     },
     {
       scheduledArrivalTime: "11:00",
-      actualArrivalTime: "11:05",
+      status: "Delayed",
       flightNumber: "UA456",
       destination: "JFK",
       gate: "B2",
     },
     {
       scheduledArrivalTime: "12:00",
-      actualArrivalTime: "12:20",
+      status: "Cancelled",
       flightNumber: "DL789",
       destination: "ORD",
       gate: "C3",
     },
     {
       scheduledArrivalTime: "13:00",
-      actualArrivalTime: "13:10",
+      status: "On Time",
       flightNumber: "SW101",
       destination: "DAL",
       gate: "A2",
     },
     {
       scheduledArrivalTime: "14:00",
-      actualArrivalTime: "14:00",
+      status: "On Time",
       flightNumber: "AS222",
       destination: "SEA",
       gate: "B3",
     },
     {
       scheduledArrivalTime: "15:00",
-      actualArrivalTime: "15:30",
+      status: "Delayed",
       flightNumber: "B6333",
       destination: "BOS",
       gate: "C4",
     },
     {
       scheduledArrivalTime: "16:00",
-      actualArrivalTime: "16:05",
+      status: "On Time",
       flightNumber: "AA444",
       destination: "MIA",
       gate: "A3",
     },
     {
       scheduledArrivalTime: "17:00",
-      actualArrivalTime: "17:15",
+      status: "On Time",
       flightNumber: "UA555",
       destination: "SFO",
       gate: "B4",
     },
     {
       scheduledArrivalTime: "18:00",
-      actualArrivalTime: "18:20",
+      status: "Delayed",
       flightNumber: "DL666",
       destination: "ATL",
       gate: "C5",
     },
     {
       scheduledArrivalTime: "19:00",
-      actualArrivalTime: "19:10",
+      status: "On Time",
       flightNumber: "SW777",
       destination: "HOU",
       gate: "A4",
     },
     {
       scheduledArrivalTime: "20:00",
-      actualArrivalTime: "20:00",
+      status: "On Time",
       flightNumber: "AS888",
       destination: "PDX",
       gate: "B5",
     },
     {
       scheduledArrivalTime: "21:00",
-      actualArrivalTime: "21:30",
+      status: "Delayed",
       flightNumber: "B6999",
       destination: "JAX",
       gate: "C6",
