@@ -51,7 +51,13 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
 
     // Assuming the first sheet is the one with flight data
     const sheetName = workbook.SheetNames[0];
+    if (!sheetName) {
+      throw new Error("No sheet found in the Excel file.");
+    }
     const sheet = workbook.Sheets[sheetName];
+    if (!sheet) {
+      throw new Error(`Sheet "${sheetName}" not found.`);
+    }
     const rawData: any[] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
 
