@@ -28,7 +28,7 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
 
     if (!response.ok) {
       console.log('File download failed');
-      throw new Error(`Failed to fetch. Status code: ${response.status}`);
+      throw new Error(`Failed to fetch. Status code: ${response.status} ${response.statusText}`);
     }
     console.log('File downloaded successfully');
 
@@ -47,11 +47,11 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
  	// Function to standardize keys
  	const standardizeKey = (key: string) => {
  		const lowerKey = key.toLowerCase();
- 		if (lowerKey.includes('flight number')) return 'flightNumber';
- 		if (lowerKey.includes('destination')) return 'destination';
- 		if (lowerKey.includes('scheduled arrival time')) return 'scheduledArrivalTime';
- 		if (lowerKey.includes('actual arrival')) return 'status'; // or 'actualArrivalTime' if you have that
- 		if (lowerKey.includes('gate')) return 'gate';
+ 		if (lowerKey.includes('Flight #')) return 'Flight #';
+ 		if (lowerKey.includes('City')) return 'City';
+ 		if (lowerKey.includes('Sched Time')) return 'Sched Time';
+ 		if (lowerKey.includes('Status')) return 'Status'; // or 'actualArrivalTime' if you have that
+ 		if (lowerKey.includes('Gate')) return 'Gate';
  		return lowerKey; // fallback to the key as is
  	};
  
@@ -64,24 +64,24 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
  		if (!row) continue;
  
  		const flight: FlightData = {
- 			flightNumber: row[standardizedHeaders.indexOf('flightNumber')] || '',
- 			destination: row[standardizedHeaders.indexOf('destination')] || '',
- 			scheduledArrivalTime: row[standardizedHeaders.indexOf('scheduledArrivalTime')] || '',
- 			status: row[standardizedHeaders.indexOf('status')] || '',
- 			gate: row[standardizedHeaders.indexOf('gate')] || '',
+ 			flightNumber: row[standardizedHeaders.indexOf('Flight #')] || '',
+ 			destination: row[standardizedHeaders.indexOf('City')] || '',
+ 			scheduledArrivalTime: row[standardizedHeaders.indexOf('Sched Time')] || '',
+ 			status: row[standardizedHeaders.indexOf('Status')] || '',
+ 			gate: row[standardizedHeaders.indexOf('Gate')] || '',
  		};
  		flightData.push(flight);
  	}
-
-    clearTimeout(timeoutId);
-    return flightData;
-  } catch (error: any) {
-      let message = 'An unknown error occurred';
-       if (error instanceof Error) {
-           message = error.message;
-       }
-     console.error("Error fetching or parsing flight data:", message);
-     throw new Error(message); // Re-throw the error to be caught by the component
-   }
- }
-
+ 
+     clearTimeout(timeoutId);
+     return flightData;
+   } catch (error: any) {
+       let message = 'An unknown error occurred';
+        if (error instanceof Error) {
+            message = error.message;
+        }
+      console.error("Error fetching or parsing flight data:", message);
+      throw new Error(message); // Re-throw the error to be caught by the component
+    }
+  }
+ 
