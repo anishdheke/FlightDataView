@@ -31,14 +31,22 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState("asc");
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const data = await getFlightData(FLIGHT_DATA_URL);
-      setFlightData(data);
-    } catch (error) {
-      console.error("Error fetching flight data:", error);
+      if (data && data.length > 0) {
+        setFlightData(data);
+      } else {
+        setFlightData([]);
+        setError("No flights available");
+      }
+    } catch (e) {
+      setError("Failed to fetch flight data.");
       toast({
         title: "Error",
         description: "Failed to fetch flight data.",
@@ -101,7 +109,8 @@ export default function Home() {
   // Apply default filter on initial load
   useEffect(() => {
     setFilterCriteria((prev) => ({ ...prev, gate: DEFAULT_FILTER }));
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   const handleRefresh = () => {
     fetchData();
@@ -180,7 +189,7 @@ export default function Home() {
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="text-center">
-                  No flights available for the specified criteria.
+                 {error || "No flights available for the specified criteria."}
                 </TableCell>
               </TableRow>
             )}
