@@ -39,8 +39,12 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     if (!response.ok) {
       throw new Error(`Failed to fetch. Status code: ${response.status}`);
     }
-
+    
     const arrayBuffer = await response.arrayBuffer();
+    if (!arrayBuffer) {
+        throw new Error("Failed to read response body");
+    }
+
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
     // Assuming the first sheet is the one with flight data
