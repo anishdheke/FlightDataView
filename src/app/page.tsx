@@ -23,8 +23,7 @@ export default function Home() {
   const [flightData, setFlightData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filterCriteria, setFilterCriteria] = useState({
-    flightNumber: "",
-    destination: "",
+    gate: "",
   });
   const [sortBy, setSortBy] = useState("flightNumber");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -54,8 +53,7 @@ export default function Home() {
   useEffect(() => {
     let results = flightData.filter((item) => {
       return (
-        item.flightNumber.toLowerCase().includes(filterCriteria.flightNumber.toLowerCase()) &&
-        item.destination.toLowerCase().includes(filterCriteria.destination.toLowerCase())
+        item.gate.toLowerCase().includes(filterCriteria.gate.toLowerCase())
       );
     });
 
@@ -110,16 +108,9 @@ export default function Home() {
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             <Input
               type="text"
-              name="flightNumber"
-              placeholder="Filter by Flight Number"
-              value={filterCriteria.flightNumber}
-              onChange={handleFilterChange}
-            />
-            <Input
-              type="text"
-              name="destination"
-              placeholder="Filter by Destination"
-              value={filterCriteria.destination}
+              name="gate"
+              placeholder="Filter by Gate"
+              value={filterCriteria.gate}
               onChange={handleFilterChange}
             />
              <Select onValueChange={(value) => setItemsPerPage(parseInt(value))}>
@@ -152,6 +143,9 @@ export default function Home() {
                <TableHead onClick={() => handleSortChange("actualArrivalTime")} className="cursor-pointer text-primary">
                 Actual Arrival {getSortIcon("actualArrivalTime")}
               </TableHead>
+               <TableHead onClick={() => handleSortChange("gate")} className="cursor-pointer text-primary">
+                Gate {getSortIcon("gate")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -161,6 +155,7 @@ export default function Home() {
                 <TableCell>{item.destination}</TableCell>
                 <TableCell>{item.scheduledArrivalTime}</TableCell>
                  <TableCell>{item.actualArrivalTime}</TableCell>
+                <TableCell>{item.gate}</TableCell>
               </TableRow>
             ))}
           </TableBody>
