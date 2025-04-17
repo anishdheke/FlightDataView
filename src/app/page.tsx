@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { getFlightData } from "@/services/flight-data";
 import {
   Table,
@@ -17,12 +17,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FLIGHT_DATA_URL = "https://apps.dfwairport.com/flightexcel";
+const DEFAULT_FILTER = "d1,d2,d3,d4";
 
 export default function Home() {
   const [flightData, setFlightData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filterCriteria, setFilterCriteria] = useState({
-    gate: "",
+    gate: DEFAULT_FILTER,
   });
   const [sortBy, setSortBy] = useState("flightNumber");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -32,7 +33,6 @@ export default function Home() {
     try {
       const data = await getFlightData(FLIGHT_DATA_URL);
       setFlightData(data);
-      setFilteredData(data);
     } catch (error) {
       console.error("Error fetching flight data:", error);
       toast({
@@ -92,6 +92,12 @@ export default function Home() {
     return null;
   };
 
+  // Apply default filter on initial load
+  useEffect(() => {
+    // This will trigger the filter effect after the component mounts
+    setFilterCriteria((prev) => ({ ...prev, gate: DEFAULT_FILTER }));
+  }, []);
+
   return (
     <div className="container mx-auto p-4">
       <Toaster />
@@ -134,15 +140,23 @@ export default function Home() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>{item.flightNumber}</TableCell>
-                <TableCell>{item.destination}</TableCell>
-                <TableCell>{item.scheduledArrivalTime}</TableCell>
-                 <TableCell>{item.status}</TableCell>
-                <TableCell>{item.gate}</TableCell>
+            {filteredData.length > 0 ? (
+              filteredData.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell>{item.flightNumber}</TableCell>
+                  <TableCell>{item.destination}</TableCell>
+                  <TableCell>{item.scheduledArrivalTime}</TableCell>
+                  <TableCell>{item.status}</TableCell>
+                  <TableCell>{item.gate}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  No flights available for the specified criteria.
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </ScrollArea>
