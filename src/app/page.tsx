@@ -144,10 +144,10 @@ export default function Home() {
                 Destination {getSortIcon("destination")}
               </TableHead>
               <TableHead onClick={() => handleSortChange("scheduledArrivalTime")} className="cursor-pointer text-primary">
-                Scheduled Arrival {getSortIcon("scheduledArrivalTime")}
+                Flight Time {getSortIcon("scheduledArrivalTime")}
               </TableHead>
                <TableHead onClick={() => handleSortChange("actualArrivalTime")} className="cursor-pointer text-primary">
-                Actual Arrival {getSortIcon("actualArrivalTime")}
+                Status {getSortIcon("actualArrivalTime")}
               </TableHead>
                <TableHead onClick={() => handleSortChange("gate")} className="cursor-pointer text-primary">
                 Gate {getSortIcon("gate")}
