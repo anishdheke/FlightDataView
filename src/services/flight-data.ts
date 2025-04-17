@@ -35,6 +35,11 @@ export interface FlightData {
 export async function getFlightData(url: string): Promise<FlightData[]> {
   try {
     const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch. Status code: ${response.status}`);
+    }
+
     const arrayBuffer = await response.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
@@ -53,7 +58,7 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     }));
 
     return flightData;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching or parsing flight data:", error);
     return []; // Return an empty array in case of error
   }
