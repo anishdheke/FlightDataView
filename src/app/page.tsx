@@ -15,6 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 const FLIGHT_DATA_URL = "https://apps.dfwairport.com/flightexcel";
 const DEFAULT_FILTER = "d1,d2,d3,d4";
@@ -28,8 +30,10 @@ export default function Home() {
   const [sortBy, setSortBy] = useState("flightNumber");
   const [sortOrder, setSortOrder] = useState("asc");
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
+    setIsLoading(true);
     try {
       const data = await getFlightData(FLIGHT_DATA_URL);
       setFlightData(data);
@@ -40,6 +44,8 @@ export default function Home() {
         description: "Failed to fetch flight data.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   }, [toast]);
 
@@ -94,16 +100,22 @@ export default function Home() {
 
   // Apply default filter on initial load
   useEffect(() => {
-    // This will trigger the filter effect after the component mounts
     setFilterCriteria((prev) => ({ ...prev, gate: DEFAULT_FILTER }));
   }, []);
+
+  const handleRefresh = () => {
+    fetchData();
+  };
 
   return (
     <div className="container mx-auto p-4">
       <Toaster />
       <Card className="bg-secondary sticky top-0 z-10">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-primary">Flight Data Viewer</CardTitle>
+          <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={isLoading}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-1">
@@ -122,19 +134,34 @@ export default function Home() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead onClick={() => handleSortChange("flightNumber")} className="cursor-pointer text-primary">
+              <TableHead
+                onClick={() => handleSortChange("flightNumber")}
+                className="cursor-pointer text-primary"
+              >
                 Flight Number {getSortIcon("flightNumber")}
               </TableHead>
-              <TableHead onClick={() => handleSortChange("destination")} className="cursor-pointer text-primary">
+              <TableHead
+                onClick={() => handleSortChange("destination")}
+                className="cursor-pointer text-primary"
+              >
                 Destination {getSortIcon("destination")}
               </TableHead>
-              <TableHead onClick={() => handleSortChange("scheduledArrivalTime")} className="cursor-pointer text-primary">
+              <TableHead
+                onClick={() => handleSortChange("scheduledArrivalTime")}
+                className="cursor-pointer text-primary"
+              >
                 Flight Time {getSortIcon("scheduledArrivalTime")}
               </TableHead>
-               <TableHead onClick={() => handleSortChange("status")} className="cursor-pointer text-primary">
+              <TableHead
+                onClick={() => handleSortChange("status")}
+                className="cursor-pointer text-primary"
+              >
                 Status {getSortIcon("status")}
               </TableHead>
-               <TableHead onClick={() => handleSortChange("gate")} className="cursor-pointer text-primary">
+              <TableHead
+                onClick={() => handleSortChange("gate")}
+                className="cursor-pointer text-primary"
+              >
                 Gate {getSortIcon("gate")}
               </TableHead>
             </TableRow>
