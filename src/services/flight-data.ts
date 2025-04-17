@@ -39,18 +39,18 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     if (!response.ok) {
       throw new Error(`Failed to fetch. Status code: ${response.status}`);
     }
-    
+
     const arrayBuffer = await response.arrayBuffer();
     if (!arrayBuffer) {
         throw new Error("Failed to read response body");
     }
-
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
     // Assuming the first sheet is the one with flight data
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-    const rawData: any[] = XLSX.utils.sheet_to_json(sheet, {header: 1});
+    const rawData: any[] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
 
     // Check if rawData has at least one row (header row)
     if (!rawData || rawData.length === 0) {
@@ -85,7 +85,7 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
       });
 
     return flightData;
-  } catch (error) {
+  } catch (error: any) {
       let message = 'Failed to fetch';
       if (error instanceof Error) {
           message = error.message;
