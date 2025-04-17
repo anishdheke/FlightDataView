@@ -11,11 +11,10 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FLIGHT_DATA_URL = "https://apps.dfwairport.com/flightexcel";
 
@@ -27,8 +26,6 @@ export default function Home() {
   });
   const [sortBy, setSortBy] = useState("flightNumber");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   const { toast } = useToast();
 
   const fetchData = useCallback(async () => {
@@ -72,7 +69,6 @@ export default function Home() {
     });
 
     setFilteredData(results);
-    setCurrentPage(1); // Reset to first page after filtering
   }, [flightData, filterCriteria, sortBy, sortOrder]);
 
   const handleFilterChange = (e) => {
@@ -89,13 +85,6 @@ export default function Home() {
     }
   };
 
-  // Pagination
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
   const getSortIcon = (field) => {
     if (sortBy === field) {
       return sortOrder === "asc" ? "▲" : "▼";
@@ -106,34 +95,24 @@ export default function Home() {
   return (
     <div className="container mx-auto p-4">
       <Toaster />
-      <Card className="bg-secondary">
+      <Card className="bg-secondary sticky top-0 z-10">
         <CardHeader>
           <CardTitle className="text-primary">Flight Data Viewer</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-1">
             <Input
               type="text"
               name="gate"
-              placeholder="Filter by Gate"
+              placeholder="d1,d2,d3,d4"
               value={filterCriteria.gate}
               onChange={handleFilterChange}
             />
-             <Select onValueChange={(value) => setItemsPerPage(parseInt(value))}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Items per page" defaultValue={String(itemsPerPage)} />
-              </SelectTrigger>
-              <SelectContent>
-                {[10, 20, 50].map((items) => (
-                  <SelectItem key={items} value={String(items)}>{items}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </CardContent>
       </Card>
 
-      <div className="overflow-x-auto mt-4">
+      <ScrollArea className="overflow-x-auto mt-4">
         <Table>
           <TableHeader>
             <TableRow>
@@ -155,7 +134,7 @@ export default function Home() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.map((item, index) => (
+            {filteredData.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>{item.flightNumber}</TableCell>
                 <TableCell>{item.destination}</TableCell>
@@ -166,26 +145,7 @@ export default function Home() {
             ))}
           </TableBody>
         </Table>
-      </div>
-
-      <div className="flex justify-center mt-4">
-        <Button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          variant="outline"
-          className="mr-2 bg-accent text-primary-foreground"
-        >
-          Previous
-        </Button>
-        <Button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          variant="outline"
-          className="bg-accent text-primary-foreground"
-        >
-          Next
-        </Button>
-      </div>
+      </ScrollArea>
     </div>
   );
 }
