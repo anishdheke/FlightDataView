@@ -21,18 +21,24 @@ import { RefreshCw } from "lucide-react";
 const FLIGHT_DATA_URL = "https://apps.dfwairport.com/flightexcel";
 const DEFAULT_FILTER = "d1,d2,d3,d4";
 
+type FlightData = {
+  flightNumber: string;
+  destination: string;
+  scheduledArrivalTime: string;
+  status: string;
+  gate: string;
+};
 export default function Home() {
-  const [flightData, setFlightData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  const [flightData, setFlightData] = useState<FlightData[]>([]);
+  const [filteredData, setFilteredData] = useState<FlightData[]>([]);
   const [filterCriteria, setFilterCriteria] = useState({
     gate: DEFAULT_FILTER,
   });
   const [sortBy, setSortBy] = useState("flightNumber");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -61,36 +67,41 @@ export default function Home() {
     fetchData();
   }, [fetchData]);
 
+  type SortableField = keyof FlightData;
   useEffect(() => {
     const gates = filterCriteria.gate
       .toLowerCase()
       .split(",")
       .map((gate) => gate.trim());
 
-    let results = flightData.filter((item) => {
-      if (gates.length === 0 || (gates.length === 1 && gates[0] === "")) {
+    let results = flightData.filter((item: FlightData) => {
+      if (gates.length === 0 || (gates.length === 1 && gates[0] === "" )) {
         return true; // Show all if no filter is applied
       }
-      return gates.some((gate) => item.gate.toLowerCase().includes(gate));
+      return gates.some((gate) => item.gate?.toLowerCase().includes(gate));
     });
 
     // Sorting logic
     results = [...results].sort((a, b) => {
       const order = sortOrder === "asc" ? 1 : -1;
-      if (a[sortBy] < b[sortBy]) return -1 * order;
-      if (a[sortBy] > b[sortBy]) return 1 * order;
+      const valueA = a[sortBy as SortableField];
+      const valueB = b[sortBy as SortableField];
+      if (valueA < valueB) return -1 * order;
+      if (valueA > valueB) return 1 * order;
       return 0;
     });
 
-    setFilteredData(results);
-  }, [flightData, filterCriteria, sortBy, sortOrder]);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilterCriteria((prev) => ({ ...prev, [name]: value }));
+    setFilteredData(results);
+  }, [flightData, filterCriteria.gate, sortBy, sortOrder]);
+
+  const handleFilterChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    setFilterCriteria((prev) => ({ ...prev, gate: value }));
   };
 
-  const handleSortChange = (field) => {
+  const handleSortChange = (field: SortableField) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -98,8 +109,8 @@ export default function Home() {
       setSortOrder("asc");
     }
   };
-
-  const getSortIcon = (field) => {
+  
+  const getSortIcon = (field:string) => {
     if (sortBy === field) {
       return sortOrder === "asc" ? "▲" : "▼";
     }
@@ -178,7 +189,7 @@ export default function Home() {
           <TableBody>
             {filteredData.length > 0 ? (
               filteredData.map((item, index) => (
-                <TableRow key={index}>
+                <TableRow key={index} >
                   <TableCell>{item.flightNumber}</TableCell>
                   <TableCell>{item.destination}</TableCell>
                   <TableCell>{item.scheduledArrivalTime}</TableCell>

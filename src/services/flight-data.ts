@@ -34,9 +34,12 @@ export interface FlightData {
  */
 export async function getFlightData(url: string): Promise<FlightData[]> {
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      mode: 'cors' // Add this to handle potential CORS issues
+    });
 
     if (!response.ok) {
+      console.error("Fetch failed with status:", response.status);
       throw new Error(`Failed to fetch. Status code: ${response.status}`);
     }
 
