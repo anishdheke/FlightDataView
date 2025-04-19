@@ -12,9 +12,6 @@ export interface FlightData {
   gate: string;
 }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // milliseconds
-
 /**
  * Fetches and parses flight data from an XLSX file.
  * @param url The URL of the XLSX file.
@@ -22,12 +19,10 @@ const RETRY_DELAY = 1000; // milliseconds
  */
 export async function getFlightData(url: string): Promise<FlightData[]> {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    console.log('Attempting to download file from:', url);
 
     const response = await axios.get(url, {
       responseType: 'arraybuffer',
-      signal: controller.signal,
     });
 
     if (response.status !== 200) {
@@ -41,13 +36,12 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const data = XLSX.utils.sheet_to_json(worksheet);
-    clearTimeout(timeoutId);
 
     const flightData: FlightData[] = data.map((row: any) => ({
-      scheduledArrivalTime: row['Sch Arrival Time'] || '',
-      status: row['Act. Arrival'] || '',
-      flightNumber: row['Flight'],
-      destination: row['To'] || '',
+      scheduledArrivalTime: row['Sched Time'] || '',
+      status: row['Status'] || '',
+      flightNumber: row['Flight #'],
+      destination: row['City'] || '',
       gate: row['Gate'] || '',
     }));
 
