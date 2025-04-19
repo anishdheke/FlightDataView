@@ -18,7 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
-const FLIGHT_DATA_URL = "https://apps.dfwairport.com/flightexcel";
+const FLIGHT_DATA_URL = "/api/flightexcel";
 const DEFAULT_FILTER = "d1,d2,d3,d4";
 
 type FlightData = {
