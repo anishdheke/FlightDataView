@@ -24,18 +24,24 @@ import * as XLSX from 'xlsx';
     const timeoutId = setTimeout(() => controller.abort(), 5000);
  
 
-    console.log('Attempting to download file...');
-    const response: Response = await fetch(url, {
-      mode: 'cors', // Add this to handle potential CORS issues
+    let response: Response;
+    try {
+      console.log('Attempting to download file...');
+      response = await fetch(url, {
+        mode: 'cors', // Add this to handle potential CORS issues
  	  signal: controller.signal,
-    });
+      });
+      console.log('File downloaded successfully');
+    } catch (fetchError:any) {
+      console.error("Error during fetch:", fetchError.message, "URL:", url);
+      throw new Error(`Failed to fetch: ${fetchError.message}`);
+    }
  
 
     if (!response.ok) {
  	  console.log('File download failed');
       throw new Error(`Failed to fetch. Status code: ${response.status} ${response.statusText}`);
     }
-    console.log('File downloaded successfully');
  
 
     const arrayBuffer = await response.arrayBuffer();
@@ -89,14 +95,13 @@ import * as XLSX from 'xlsx';
      clearTimeout(timeoutId);
      return flightData;
    } catch (error: any) {
-        let message = 'An unknown error occurred';
-         if (error instanceof Error) {
-             message = error.message;
-         }
-       console.error("Error fetching or parsing flight data:", message);
-       throw new Error(message); // Re-throw the error to be caught by the component
-     }
-   }
+         let message = 'An unknown error occurred';
+          if (error instanceof Error) {
+              message = error.message;
+          }
+        console.error("Error fetching or parsing flight data:", message);
+        throw new Error(message); // Re-throw the error to be caught by the component
+      }
+    }
  
-
 
