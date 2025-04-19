@@ -44,7 +44,7 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
       destination: row['City'] || '',
       gate: row['Gate'] || '',
     }));
-
+console.log(flightData.toString)
     return flightData;
   } catch (error: any) {
     let message = "Failed to fetch";
