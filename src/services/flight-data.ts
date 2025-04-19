@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import axios from 'axios';
 
 /**
  * Represents flight data.
@@ -24,18 +25,18 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const response: Response = await fetch(url, {
-      mode: 'cors', // Add this to handle potential CORS issues
- 	  signal: controller.signal,
+    const response = await axios.get(url, {
+      responseType: 'arraybuffer',
+      signal: controller.signal,
     });
- 
-     if (!response.ok) {
-         console.log("File download failed");
-         throw new Error(`HTTP error! status: ${response.status}`);
-     }
-    
+
+    if (response.status !== 200) {
+      console.error("File download failed with status:", response.status);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     console.log("File downloaded successfully");
-    const arrayBuffer = await response.arrayBuffer();
+    const arrayBuffer = response.data as ArrayBuffer;
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
@@ -51,12 +52,19 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     }));
 
     return flightData;
-  } catch (error:any) {
+  } catch (error: any) {
     let message = "Failed to fetch";
-        if (error instanceof Error) {
-            message = error.message;
-        }
-      console.error("Error fetching or parsing flight data:", message);
+    if (axios.isAxiosError(error)) {
+      message = error.message;
+      console.error("Error during axios fetch:", error.message, "URL:", url);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response headers:", error.response.headers);
+      }
+    } else if (error instanceof Error) {
+      message = error.message;
+    }
+    console.error("Error fetching or parsing flight data:", message);
     throw new Error(message); // Re-throw the error to be caught by the component
   }
 }
