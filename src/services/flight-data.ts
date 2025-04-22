@@ -62,3 +62,4 @@ console.log(flightData.toString)
     throw new Error(message); // Re-throw the error to be caught by the component
   }
 }
+
