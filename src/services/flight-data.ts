@@ -36,15 +36,17 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const data = XLSX.utils.sheet_to_json(worksheet);
-
+    
+    
     const flightData: FlightData[] = data.map((row: any) => ({
-      scheduledArrivalTime: row['Sched Time'] || '',
-      status: row['Status'] || '',
-      flightNumber: row['Flight #'],
+        scheduledArrivalTime: row['Sched Time'] || '',
+        status: row['Status'] || '',
+        flightNumber: row['Flight #'],
       destination: row['City'] || '',
-      gate: row['Gate'] || '',
+       gate: row['Gate'] || '',
     }));
-console.log(flightData.toString)
+     
+
     return flightData;
   } catch (error: any) {
     let message = "Failed to fetch";
