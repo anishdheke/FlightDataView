@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import axios from 'axios';
 
+
 /**
  * Represents flight data.
  */
@@ -15,7 +16,8 @@ export interface FlightData {
 /**
  * Fetches and parses flight data from an XLSX file.
  * @param url The URL of the XLSX file.
- * @returns A promise that resolves to an array of FlightData objects.
+ * @returns A promise that resolves to an array of FlightData objects in json format
+ *
  */
 export async function getFlightData(url: string): Promise<FlightData[]> {
   try {
@@ -34,20 +36,14 @@ export async function getFlightData(url: string): Promise<FlightData[]> {
     const arrayBuffer = response.data as ArrayBuffer;
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
     const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(worksheet);
+    const worksheet = workbook.Sheets[sheetName];    
     
+    console.log(XLSX.utils.sheet_to_txt(worksheet));
+      const data = XLSX.utils.sheet_to_json(worksheet);
     
-    const flightData: FlightData[] = data.map((row: any) => ({
-        scheduledArrivalTime: row['Sched Time'] || '',
-        status: row['Status'] || '',
-        flightNumber: row['Flight #'],
-      destination: row['City'] || '',
-       gate: row['Gate'] || '',
-    }));
-     
+    const jsonFlightData = JSON.stringify(data);
 
-    return flightData;
+    return  JSON.parse(jsonFlightData) as FlightData[];
   } catch (error: any) {
     let message = "Failed to fetch";
     if (axios.isAxiosError(error)) {
